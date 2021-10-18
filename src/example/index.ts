@@ -8,6 +8,12 @@ Server.getInstance({
     `${path.dirname(__filename)}/Controllers`,
     `${path.dirname(__filename)}/Controllers_A`,
   ],
+  pluginsPath: `${path.dirname(__filename)}/Plugins`,
+  logger: {
+    prettyPrint: {
+      levelFirst: true,
+    },
+  },
 });
 
 Server.start();

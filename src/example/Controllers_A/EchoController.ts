@@ -1,4 +1,4 @@
-import {Path, POST, GET, Request, Response} from '../../lib/';
+import {Path, POST, GET, Request, Response, Server} from '../../lib/';
 
 @Path('/echo')
 class EchoController {
@@ -8,7 +8,8 @@ class EchoController {
   }
 
   @GET('/:id')
-  echoParameterHandler(request: Request, response: Response) {
+  async echoParameterHandler(request: Request, response: Response) {
+    console.log('from plugin:', Server.getFastifyInstance().someSupport());
     const params: any = request.params;
     response.send({id: params.id});
   }

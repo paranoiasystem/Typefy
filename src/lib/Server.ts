@@ -10,37 +10,44 @@ class Server {
 
   protected static fastifyInstance: Fastify.FastifyInstance;
 
-  private static port: string;
-  private static host: string;
-  private static controllersPaths: Array<string>;
+  private static options: IServerOptions;
 
   private static initialize(options?: IServerOptions): Server {
-    Server.port = options?.port || '3000';
-    Server.host = options?.host || 'localhost';
-    Server.controllersPaths = options?.controllersPaths || [];
+    Server.options = options || {};
 
-    Server.fastifyInstance = Fastify.fastify({
-      logger: true,
-    });
+    Server.fastifyInstance = Fastify.fastify(options);
 
     return Server;
   }
 
   public static start(): void {
+    Server.loadPlugins();
     Server.loadControllers();
     Server.recordRoutes();
-    Server.fastifyInstance.listen(this.port!, this.host!);
+    Server.fastifyInstance.listen(this.options.port!, this.options.host!);
   }
 
   private static loadControllers(): void {
     try {
-      _.forEach(Server.controllersPaths, (controllersPath: string) => {
+      _.forEach(Server.options.controllersPaths, (controllersPath: string) => {
         _.forEach(fs.readdirSync(controllersPath), controller => {
           require(`${controllersPath}/${controller}`);
         });
       });
     } catch (e) {
       throw new Error('The controller folder seems not exist');
+    }
+  }
+
+  private static loadPlugins(): void {
+    try {
+      _.forEach(fs.readdirSync(Server.options.pluginsPath || ''), plugin => {
+        this.fastifyInstance.register(
+          require(`${Server.options.pluginsPath}/${plugin}`)
+        );
+      });
+    } catch (e) {
+      throw new Error('The plugins folder seems not exist');
     }
   }
 
