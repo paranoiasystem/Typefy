@@ -1,7 +1,7 @@
 import * as Fastify from 'fastify';
 import * as fs from 'fs';
 import * as _ from 'lodash';
-import {IServerOption} from './Interfaces';
+import {IRouterOptions, IServerOptions} from './Interfaces';
 import {PathContainer, RouteContainer} from './Decorators';
 
 class Server {
@@ -14,7 +14,7 @@ class Server {
   private static host: string;
   private static controllersPaths: Array<string>;
 
-  private static initialize(options?: IServerOption): Server {
+  private static initialize(options?: IServerOptions): Server {
     Server.port = options?.port || '3000';
     Server.host = options?.host || 'localhost';
     Server.controllersPaths = options?.controllersPaths || [];
@@ -33,13 +33,10 @@ class Server {
   }
 
   private static loadControllers(): void {
-    const regex = /^.*\.(js)$/gm;
     try {
       _.forEach(Server.controllersPaths, (controllersPath: string) => {
         _.forEach(fs.readdirSync(controllersPath), controller => {
-          if (regex.exec(controller)) {
-            require(`${controllersPath}/${controller}`);
-          }
+          require(`${controllersPath}/${controller}`);
         });
       });
     } catch (e) {
@@ -51,7 +48,7 @@ class Server {
     !basePath ? path : path !== '/' ? `${basePath}${path}` : basePath;
 
   private static recordRoutes(): void {
-    _.forEach(RouteContainer._providers, route => {
+    _.forEach(RouteContainer._providers, (route: IRouterOptions) => {
       _.forEach(PathContainer._providers, (path, pathKey) => {
         if (route.controllerName === pathKey) {
           Server.fastifyInstance.route({
@@ -74,7 +71,7 @@ class Server {
     });
   }
 
-  public static getInstance(options?: IServerOption): Server {
+  public static getInstance(options?: IServerOptions): Server {
     if (!Server._instance) {
       Server._instance = Server.initialize(options);
     }
