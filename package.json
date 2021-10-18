@@ -5,7 +5,6 @@
   "main": "build/example/index.js",
   "scripts": {
     "lint": "gts lint",
-    "lint:clean": "gts clean",
     "lint:fix": "gts fix",
     "start": "cross-env NODE_ENV=dev ts-node-dev src/example/index.ts"
   },
@@ -19,6 +18,7 @@
     "@types/node": "^14.17.27",
     "cross-env": "^7.0.3",
     "gts": "^3.1.0",
+    "pino-pretty": "7.0.1",
     "pre-commit": "^1.2.2",
     "ts-node": "^10.3.0",
     "ts-node-dev": "^1.1.8",
