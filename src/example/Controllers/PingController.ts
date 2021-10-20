@@ -1,4 +1,4 @@
-import {Path, GET, Request, Response} from '../../lib/';
+import {Path, GET, Request, Response} from '../../lib';
 
 @Path('/ping')
 class PingController {

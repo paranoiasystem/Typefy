@@ -1,4 +1,5 @@
 import * as Fastify from 'fastify';
+import AutoLoad from 'fastify-autoload';
 import * as fs from 'fs';
 import * as _ from 'lodash';
 import {IRouterOptions, IServerOptions} from './Interfaces';
@@ -8,70 +9,74 @@ class Server {
   // Singleton Pattern
   private static _instance: Server;
 
-  protected static fastifyInstance: Fastify.FastifyInstance;
+  private static _fastify: Fastify.FastifyInstance;
 
   private static options: IServerOptions;
 
   private static initialize(options?: IServerOptions): Server {
-    Server.options = options || {};
+    this.options = options || {};
 
-    Server.fastifyInstance = Fastify.fastify(options);
+    this._fastify = Fastify.fastify(options);
 
-    return Server;
+    return this;
   }
 
-  public static start(): void {
-    Server.loadPlugins();
-    Server.loadControllers();
-    Server.recordRoutes();
-    Server.fastifyInstance.listen(this.options.port!, this.options.host!);
+  public static async start(): Promise<void> {
+    await this.loadPlugins();
+    await this.loadControllers();
+    await this.recordRoutes();
+    await this.fastify.ready(e => {
+      if (e) throw e;
+    });
+    this.fastify.listen(this.options.port!, this.options.host!);
   }
 
-  private static loadControllers(): void {
+  private static async loadControllers(): Promise<void> {
     try {
       _.forEach(Server.options.controllersPaths, (controllersPath: string) => {
         _.forEach(fs.readdirSync(controllersPath), controller => {
           require(`${controllersPath}/${controller}`);
         });
       });
-    } catch (e) {
-      throw new Error('The controller folder seems not exist');
+    } catch (e: any) {
+      throw new Error(e.message);
     }
   }
 
-  private static loadPlugins(): void {
+  private static async loadPlugins(): Promise<void> {
     try {
-      _.forEach(fs.readdirSync(Server.options.pluginsPath || ''), plugin => {
-        this.fastifyInstance.register(
-          require(`${Server.options.pluginsPath}/${plugin}`)
-        );
+      await this.fastify.register(AutoLoad, {
+        dir: `${Server.options.pluginsPath}`,
       });
-    } catch (e) {
-      throw new Error('The plugins folder seems not exist');
+    } catch (e: any) {
+      throw new Error(e);
     }
   }
 
   private static generatePath = (path: string, basePath: string): string =>
     !basePath ? path : path !== '/' ? `${basePath}${path}` : basePath;
 
+  // TODO: migliorare i cicli for
   private static recordRoutes(): void {
     _.forEach(RouteContainer._providers, (route: IRouterOptions) => {
       _.forEach(PathContainer._providers, (path, pathKey) => {
         if (route.controllerName === pathKey) {
-          Server.fastifyInstance.route({
-            method: route.method,
-            config: undefined,
-            handler: route.handler,
-            onError: undefined,
-            onRequest: undefined,
-            onResponse: undefined,
-            onSend: undefined,
-            onTimeout: undefined,
-            preHandler: undefined,
-            preParsing: undefined,
-            preSerialization: undefined,
-            preValidation: undefined,
-            url: Server.generatePath(route.url, path),
+          this.fastify.register(async (fastify: Fastify.FastifyInstance) => {
+            fastify.route({
+              method: route.method,
+              config: undefined,
+              handler: route.handler,
+              onError: undefined,
+              onRequest: undefined,
+              onResponse: undefined,
+              onSend: undefined,
+              onTimeout: undefined,
+              preHandler: undefined,
+              preParsing: undefined,
+              preSerialization: undefined,
+              preValidation: undefined,
+              url: Server.generatePath(route.url, path),
+            });
           });
         }
       });
@@ -79,19 +84,19 @@ class Server {
   }
 
   public static getInstance(options?: IServerOptions): Server {
-    if (!Server._instance) {
-      Server._instance = Server.initialize(options);
+    if (!this._instance) {
+      this._instance = this.initialize(options);
     }
-    return Server._instance;
+    return this._instance;
   }
 
-  public static getFastifyInstance(): Fastify.FastifyInstance {
-    if (!Server._instance) {
+  public static get fastify(): Fastify.FastifyInstance {
+    if (!this._instance) {
       throw new Error(
         'Before get fastify instance you need to create the server instance'
       );
     }
-    return Server.fastifyInstance;
+    return this._fastify;
   }
 }
 

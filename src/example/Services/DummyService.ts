@@ -1,4 +1,4 @@
-import {Injectable} from '../../lib';
+import {Injectable, Server} from '../../lib';
 
 @Injectable('dummyService')
 class DummyService {
@@ -7,6 +7,8 @@ class DummyService {
   constructor() {}
 
   public dummyMethod(): string {
+    const {someSupport} = Server.fastify;
+    console.log('from plugin:', someSupport());
     return 'dummyMethod';
   }
 }
