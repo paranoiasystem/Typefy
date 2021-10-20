@@ -1,4 +1,4 @@
-import {Path, GET, Inject, Request, Response} from '../../lib/';
+import {Path, GET, Inject, Request, Response, Server} from '../../lib/';
 import DummyService from '../Services/DummyService';
 
 @Path('/dummy')
@@ -7,6 +7,8 @@ class DummyController {
 
   @GET('/method')
   dummyHandlerMethod(request: Request, response: Response) {
+    const {someSupport} = Server.fastify;
+    console.log('from plugin:', someSupport());
     response.send({message: DummyController.dummyService.dummyMethod()});
   }
 
