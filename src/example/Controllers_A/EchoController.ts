@@ -1,4 +1,4 @@
-import {Path, POST, GET, Request, Response} from '../../lib/';
+import {Path, POST, GET, Request, Response, Hook} from '../../lib/';
 
 @Path('/echo')
 class EchoController {
@@ -8,6 +8,9 @@ class EchoController {
   }
 
   @GET('/:id')
+  @Hook('onRequest', async (request: Request, response: Response) => {
+    console.log(request.headers);
+  })
   async echoParameterHandler(request: Request, response: Response) {
     const params: any = request.params;
     response.send({id: params.id});
