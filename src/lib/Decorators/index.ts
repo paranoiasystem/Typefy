@@ -10,6 +10,7 @@ import {
 } from './Route';
 import Path, {PathContainer} from './Path';
 import {Inject, Injectable} from './DependencyInjection';
+import Hook from './Hook/Hook';
 
 export {
   GET,
@@ -24,4 +25,5 @@ export {
   Inject,
   Injectable,
   RouteContainer,
+  Hook,
 };

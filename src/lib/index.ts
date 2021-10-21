@@ -11,6 +11,7 @@ import {
   Path,
   Inject,
   Injectable,
+  Hook,
 } from './Decorators';
 
 export {
@@ -27,4 +28,5 @@ export {
   DELETE,
   Inject,
   Injectable,
+  Hook,
 };

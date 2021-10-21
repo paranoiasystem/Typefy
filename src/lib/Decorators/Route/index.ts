@@ -5,6 +5,19 @@ class RouteContainer {
   public static _providers: {[key: string]: any} = {};
 }
 
+function hookRegister(
+  target: any,
+  propertyKey: string,
+  descriptor: PropertyDescriptor,
+  hookKey: string,
+  handler: Function
+) {
+  if (!RouteContainer._providers[propertyKey]) {
+    RouteContainer._providers[propertyKey] = {};
+  }
+  RouteContainer._providers[propertyKey][hookKey] = handler;
+}
+
 function baseHTTPMethod(
   target: any,
   propertyKey: string,
@@ -13,6 +26,7 @@ function baseHTTPMethod(
   path: string
 ): void {
   RouteContainer._providers[propertyKey] = {
+    ...RouteContainer._providers[propertyKey],
     method: method,
     url: path,
     handler: descriptor.value,
@@ -29,5 +43,6 @@ export {
   OPTIONS,
   DELETE,
   baseHTTPMethod,
+  hookRegister,
   RouteContainer,
 };
