@@ -8,7 +8,7 @@ class EchoController {
   }
 
   @GET('/:id')
-  @Hook('onRequest', async (request: Request, response: Response) => {
+  @Hook('onRequest', async (request: Request) => {
     console.log(request.headers);
   })
   async echoParameterHandler(request: Request, response: Response) {

@@ -1,4 +1,4 @@
-import {baseHTTPMethod} from '../';
+import RouteContainer from '../RouteContainer';
 
 export default function GET(path: string) {
   return function (
@@ -6,6 +6,6 @@ export default function GET(path: string) {
     propertyKey: string,
     descriptor: PropertyDescriptor
   ) {
-    baseHTTPMethod(target, propertyKey, descriptor, 'GET', path);
+    RouteContainer.baseHTTPMethod(target, propertyKey, descriptor, 'GET', path);
   };
 }

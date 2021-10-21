@@ -8,6 +8,9 @@
     "lint:fix": "gts fix",
     "start": "cross-env NODE_ENV=dev ts-node-dev src/example/index.ts"
   },
+  "pre-commit": [
+    "lint"
+  ],
   "author": "ParanoiaSystem (https://github.com/paranoiasystem)",
   "license": "ISC",
   "devDependencies": {
