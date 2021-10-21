@@ -1,16 +1,8 @@
-import {
-  GET,
-  POST,
-  PUT,
-  PATCH,
-  HEAD,
-  OPTIONS,
-  DELETE,
-  RouteContainer,
-} from './Route';
+import {GET, POST, PUT, PATCH, HEAD, OPTIONS, DELETE} from './methods';
+import RouteContainer from './RouteContainer';
 import Path, {PathContainer} from './Path';
 import {Inject, Injectable} from './DependencyInjection';
-import Hook from './Hook/Hook';
+import Hook from './Hook';
 
 export {
   GET,
